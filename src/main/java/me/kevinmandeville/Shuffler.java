@@ -1,13 +1,16 @@
 package me.kevinmandeville;
 
 import java.util.Random;
+import me.kevinmandeville.core.Card;
+import me.kevinmandeville.core.Deck;
+import me.kevinmandeville.core.Shoe;
 
 /**
  * @author kmandeville
  */
 public class Shuffler {
 
-    public Deck shuffleDeck(Deck deck) {
+    public static Deck shuffleDeck(Deck deck) {
         // go through deck one at a time and create a new queue of cards to create a new Deck
         Card[] shuffledArray = new Card[52];
 
@@ -16,9 +19,11 @@ public class Shuffler {
             Card card = deck.getTopCard();
             // find random slot for card in array
             int arrayPos = 0;
-            while (shuffledArray[arrayPos] != null) {
+
+            do {
                 arrayPos = random.nextInt(52);
-            }
+            } while (shuffledArray[arrayPos] != null);
+
             shuffledArray[arrayPos] = card;
         }
 
@@ -32,7 +37,7 @@ public class Shuffler {
      * @param iterations number of times to shuffle the deck
      * @return Deck that has been shuffled
      */
-    public Deck shuffleDeck(Deck deck, int iterations) {
+    public static Deck shuffleDeck(Deck deck, int iterations) {
         Deck shuffledDeck = deck;
         for (int i = 0; i < iterations; i++) {
             shuffledDeck = shuffleDeck(shuffledDeck);
@@ -40,21 +45,21 @@ public class Shuffler {
         return shuffledDeck;
     }
 
-    public Shoe shuffleShoe(Shoe shoe) {
+    public static Shoe shuffleShoe(Shoe shoe) {
         Shoe shuffledShoe = new Shoe();
 
         for (Deck deck : shoe.getDecks()) {
-            shuffledShoe.addDeck(this.shuffleDeck(deck));
+            shuffledShoe.addDeck(shuffleDeck(deck));
         }
 
         return shuffledShoe;
     }
 
-    public Shoe shuffleShoe(Shoe shoe, int iterations) {
+    public static Shoe shuffleShoe(Shoe shoe, int iterations) {
         Shoe shuffledShoe = new Shoe(shoe);
 
         for (int i = 0; i < iterations; i++) {
-            shuffledShoe = this.shuffleShoe(shuffledShoe);
+            shuffledShoe = shuffleShoe(shuffledShoe);
         }
 
         return shuffledShoe;

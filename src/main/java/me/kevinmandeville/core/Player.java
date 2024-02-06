@@ -1,4 +1,4 @@
-package me.kevinmandeville;
+package me.kevinmandeville.core;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -6,17 +6,37 @@ import java.util.Objects;
 /**
  * @author kmandeville
  */
-public class Player {
+public class Player implements Cardable {
 
     private int playerId;
     private String name;
     private BigDecimal bankRoll;
     private Hand hand;
 
-    public Player(String name, BigDecimal bankRoll, Hand hand) {
+    public Player(int playerId, String name, BigDecimal bankRoll) {
+        this.playerId = playerId;
+        this.name = name;
+        this.bankRoll = bankRoll;
+        this.hand = new Hand();
+    }
+
+    public Player(int playerId, String name, BigDecimal bankRoll, Hand hand) {
+        this.playerId = playerId;
         this.name = name;
         this.bankRoll = bankRoll;
         this.hand = hand;
+    }
+
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    @Override
+    public void takeCard(Card card) {
+        if (this.hand == null) {
+            this.hand = new Hand();
+        }
+        this.hand.addCard(card);
     }
 
     public String getName() {
@@ -29,6 +49,10 @@ public class Player {
 
     public Hand getHand() {
         return hand;
+    }
+
+    public void setHand(Hand hand) {
+        this.hand = hand;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package me.kevinmandeville;
+package me.kevinmandeville.core;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,7 +44,14 @@ public class Deck {
     }
 
     public Card getTopCard() {
+        if (this.cards.isEmpty()) {
+            throw new IllegalStateException("Deck is empty.");
+        }
         return this.cards.remove();
+    }
+
+    public int size() {
+        return cards.size();
     }
 
     @Override
