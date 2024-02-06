@@ -1,9 +1,11 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
-group = 'org.example'
+group = 'me.kevinmandeville'
 version = '1.0-SNAPSHOT'
+mainClassName = 'me.kevinmandeville.Main' // Set your main class here
 
 repositories {
     mavenCentral()
@@ -12,6 +14,21 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core:3.21.0'
+}
+
+application {
+    mainClassName = mainClassName // Set your main class here as well
+}
+
+// Define the tasks to build and assemble the executable JAR
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+
+    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 }
 
 test {

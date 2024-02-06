@@ -1,4 +1,4 @@
-package me.kevinmandeville;
+package me.kevinmandeville.core;
 
 import java.util.Objects;
 
@@ -43,7 +43,7 @@ public class Card {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(rank.getCharacterRepresentation()).append(" (").append(suit.getSymbol()).append(") ");
+        sb.append(rank.getCharacterRepresentation()).append("(").append(suit.getSymbol()).append(")");
         return sb.toString();
     }
 }

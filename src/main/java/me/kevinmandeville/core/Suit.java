@@ -1,4 +1,4 @@
-package me.kevinmandeville;
+package me.kevinmandeville.core;
 
 import java.awt.Color;
 
