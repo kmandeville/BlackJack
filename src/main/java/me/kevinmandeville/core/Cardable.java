@@ -6,4 +6,12 @@ package me.kevinmandeville.core;
 public interface Cardable {
 
     void takeCard(Card card);
+
+    boolean isBusted();
+
+    void resetHand();
+
+    boolean hasBlackJack();
+
+    boolean hasTwentyOne();
 }

@@ -1,17 +1,12 @@
 package me.kevinmandeville.strategy;
 
-import me.kevinmandeville.core.Hand;
+import java.util.Scanner;
+import me.kevinmandeville.core.BaseParticipant;
 
 /**
  * @author kmandeville
  */
 public interface HitOrStandStrategy {
 
-    boolean shouldHit(Hand hand);
-
-    boolean shouldStand(Hand hand);
-
-    boolean shouldSplit(Hand hand);
-
-    boolean shouldDoubleDown(Hand hand);
+    void playHand(BaseParticipant baseParticipant, Scanner scanner);
 }

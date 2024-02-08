@@ -13,10 +13,11 @@ public class Main {
         Player mainPlayer = new Player(1, "Player 1", new BigDecimal("10000"));
         Dealer dealer = new Dealer();
         Shoe newShoe = new Shoe();
-        Game game = new Game(dealer, List.of(mainPlayer), newShoe);
+        Game game = Game.getInstance(dealer, List.of(mainPlayer), newShoe);
         try {
             game.run();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
 //        Deck deck = new Deck();

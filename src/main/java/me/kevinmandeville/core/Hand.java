@@ -31,7 +31,7 @@ public class Hand {
         return this.cards.size();
     }
 
-    public int hardValue() {
+    public int getHardValue() {
         int total = 0;
         for (Card card : cards) {
             total += card.getRank().getValue();
@@ -39,7 +39,16 @@ public class Hand {
         return total;
     }
 
-    public int softValue() {
+    /**
+     * Method determines if there is a softValue that's different from the hard value
+     *
+     * @return true if soft and hard are different
+     */
+    public boolean hasSoftValue() {
+        return getHardValue() != getSoftValue();
+    }
+
+    public int getSoftValue() {
         int total = 0;
         for (Card card : cards) {
             total += card.getRank().getAlternateValue();
@@ -69,7 +78,7 @@ public class Hand {
         if (this.cards == null || this.cards.isEmpty()) {
             return false;
         }
-        if (this.cards.size() == 2 && this.hardValue() == 21) {
+        if (this.cards.size() == 2 && this.getHardValue() == 21) {
             return true;
         } else {
             return false;
@@ -116,6 +125,16 @@ public class Hand {
                 sb.append(card.toString());
             }
             sb.append(" ");
+        }
+
+        return sb.toString();
+    }
+
+    public String getCardTotalString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(this.getHardValue());
+        if (hasSoftValue()) {
+            sb.append(" (").append(this.getSoftValue()).append(") ");
         }
         return sb.toString();
     }
