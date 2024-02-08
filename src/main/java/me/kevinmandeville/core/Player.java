@@ -6,25 +6,24 @@ import java.util.Objects;
 /**
  * @author kmandeville
  */
-public class Player implements Cardable {
+public class Player extends BaseParticipant implements Cardable {
 
     private int playerId;
     private String name;
     private BigDecimal bankRoll;
-    private Hand hand;
 
     public Player(int playerId, String name, BigDecimal bankRoll) {
         this.playerId = playerId;
         this.name = name;
         this.bankRoll = bankRoll;
-        this.hand = new Hand();
+        super.hand = new Hand();
     }
 
     public Player(int playerId, String name, BigDecimal bankRoll, Hand hand) {
         this.playerId = playerId;
         this.name = name;
         this.bankRoll = bankRoll;
-        this.hand = hand;
+        super.hand = hand;
     }
 
     public int getPlayerId() {
@@ -33,10 +32,10 @@ public class Player implements Cardable {
 
     @Override
     public void takeCard(Card card) {
-        if (this.hand == null) {
-            this.hand = new Hand();
+        if (super.getHand() == null) {
+            super.hand = new Hand();
         }
-        this.hand.addCard(card);
+        super.getHand().addCard(card);
     }
 
     public String getName() {
@@ -45,14 +44,6 @@ public class Player implements Cardable {
 
     public BigDecimal getBankRoll() {
         return bankRoll;
-    }
-
-    public Hand getHand() {
-        return hand;
-    }
-
-    public void setHand(Hand hand) {
-        this.hand = hand;
     }
 
     @Override
@@ -65,12 +56,12 @@ public class Player implements Cardable {
         }
         Player player = (Player) o;
         return playerId == player.playerId && Objects.equals(name, player.name) && Objects.equals(
-            bankRoll, player.bankRoll) && Objects.equals(hand, player.hand);
+            bankRoll, player.bankRoll) && Objects.equals(getHand(), player.getHand());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(playerId, name, bankRoll, hand);
+        return Objects.hash(playerId, name, bankRoll, getHand());
     }
 
     @Override

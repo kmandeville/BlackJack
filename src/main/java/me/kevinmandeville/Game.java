@@ -2,11 +2,14 @@ package me.kevinmandeville;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import me.kevinmandeville.core.Cardable;
 import me.kevinmandeville.core.Dealer;
 import me.kevinmandeville.core.Deck;
 import me.kevinmandeville.core.Player;
 import me.kevinmandeville.core.Shoe;
+import me.kevinmandeville.strategy.HitOrStandStrategy;
+import me.kevinmandeville.strategy.HitStandStrategyFactory;
 
 /**
  * @author kmandeville
@@ -14,81 +17,134 @@ import me.kevinmandeville.core.Shoe;
 public class Game {
 
     public static final int NUMBER_OF_DECKS_FOR_SHOE = 8;
+    public static final int CARDS_LEFT_IN_SHOE_RESHUFFLE_POINT = 52;
+
+    private static Game instance;
     private Dealer dealer;
     private List<Player> players;
-    private List<Cardable> allHands;
+    private List<Cardable> allParticipants;
     private Shoe shoe;
 
-    public Game(Dealer dealer, List<Player> players, Shoe shoe) {
+    private Game(Dealer dealer, List<Player> players, Shoe shoe) {
         this.dealer = dealer;
         this.players = players;
         this.shoe = shoe;
-        this.allHands = new ArrayList<>();
-        this.allHands.addAll(players);
-        this.allHands.add(dealer);
+        this.allParticipants = new ArrayList<>();
+        this.allParticipants.addAll(players);
+        this.allParticipants.add(dealer);
+    }
+
+    public static Game getInstance(Dealer dealer, List<Player> players, Shoe shoe) {
+        if (instance == null) {
+            instance = new Game(dealer, players, shoe);
+        }
+        return instance;
+    }
+
+    public static Game getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Game not instantiated. Call other constructor");
+        }
+        return instance;
     }
 
     public void run() throws InterruptedException {
         this.setUpShoe();
+        String quit = "";
+        try (Scanner scanner = new Scanner(System.in)) {
+            // Add a loop that checks a variable to see if still playing (Q for quit maybe) (TODO)
+            while (!quit.equalsIgnoreCase("Q")) {
+                this.resetGame();
+                // Add applying a bet (TODO)
 
-        // Add a loop that checks a variable to see if still playing (Q for quit maybe)
+                // do I need to reshuffle the shoe?
+                if (shoe.size() < CARDS_LEFT_IN_SHOE_RESHUFFLE_POINT) {
+                    this.setUpShoe();
+                }
 
-        // Add applying a bet (@TODO)
-        // loop around players and dealer until dealer has 2 cards
-        while (dealer.getHand().size() < 2) {
-            for (Cardable allHand : allHands) {
+                // loop around players and dealer until dealer has 2 cards
+                dealStartingCards();
+
+                doesDealerHaveBlackJack();
+
+                // Pause for input loop
+                //      show player total, ask if hit or stay
+                HitStandStrategyFactory factory = new HitStandStrategyFactory();
+                for (Player player : players) {
+                    HitOrStandStrategy strategy = factory.getStrategyInstance(player);
+                    strategy.playHand(player, scanner);
+                }
+
+                // Now it's dealers turn.
+                HitOrStandStrategy dealerStrategy = factory.getStrategyInstance(dealer);
+                dealerStrategy.playHand(dealer, scanner);
+
+                System.out.println("Any key to continue or Quit(Q):");
+                quit = scanner.next();
+            }
+        }
+    }
+
+    private void resetGame() {
+        for (Cardable allParticipant : allParticipants) {
+            allParticipant.resetHand();
+        }
+    }
+
+    private boolean doesDealerHaveBlackJack() {
+        // If Dealer has an Ace showing, check if Dealer has blackjack
+        if (dealer.getHand().isAceShowing()) {
+            System.out.println("Insurance (Y/N)?");
+            // Ask if players want insurance (TODO)
+
+            if (dealer.getHand().isBlackJack()) {
+                System.out.println("Dealer has BLACKJACK! Dealer wins");
+                printGame(false, true);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void dealStartingCards() throws InterruptedException {
+        do {
+            for (Cardable allHand : allParticipants) {
                 // Deal one card each to player then dealer, then another card to player and then dealer
                 allHand.takeCard(this.shoe.getNextCard());
                 printGame(true, false);
                 Thread.sleep(500);
             }
-        }
-
-        // If Dealer has an Ace showing, check if Dealer has blackjack
-        if (dealer.getHand().isAceShowing()) {
-            System.out.println("Insurance (Y/N)?");
-            // Ask if players want insurance (@TODO)
-
-            if (dealer.getHand().isBlackJack()) {
-                System.out.println("Dealer has BLACKJACK! Dealer wins");
-                printGame(false, true);
-            }
-        }
-
-        // Pause for input loop
-        //      show player total, ask if hit or stay
-        //      deal card for hit, if under 21, loop again
-        //      if 21, skip out of loop
-        //      if over 21, player loses and is out of the game
-
-        // Now it's dealers turn.
-        //      loop until dealer is at total of 17 or greater
-        //      If dealer total is 16 or below, has to take a hit
-        //      If dealer is 17 or greater, stay.
+        } while (dealer.getHand().size() < 2);
     }
 
     private void setUpShoe() {
         // @TODO make number of decks configurable
+        this.shoe = new Shoe();
         for (int i = 0; i < NUMBER_OF_DECKS_FOR_SHOE; i++) {
             Deck deck = Shuffler.shuffleDeck(new Deck());
             this.shoe.addDeck(deck);
         }
     }
 
-    private void printGame(boolean clearScreen, boolean showDealerHoleCard) {
+    public void printGame(boolean clearScreen, boolean showDealerHoleCard) {
         if (clearScreen) {
             clearConsole();
         }
         System.out.println("Dealer:");
         System.out.println("=======");
         System.out.println(dealer.getHand().toString(showDealerHoleCard));
+        if (showDealerHoleCard) {
+            System.out.println("Total:");
+            System.out.println(dealer.getHand().getCardTotalString());
+        }
         System.out.println("\n\n\n");
 
         for (Player player : players) {
             System.out.println("Player " + player.getPlayerId());
             System.out.println("========");
             System.out.println(player.getHand());
-            System.out.println("\n\n\n\n");
+            System.out.println("Total:");
+            System.out.println(player.getHand().getCardTotalString());
         }
     }
 
