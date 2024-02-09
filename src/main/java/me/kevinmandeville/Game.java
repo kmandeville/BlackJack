@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Scanner;
 import me.kevinmandeville.core.Cardable;
 import me.kevinmandeville.core.Dealer;
-import me.kevinmandeville.core.Deck;
 import me.kevinmandeville.core.Player;
 import me.kevinmandeville.core.Shoe;
 import me.kevinmandeville.strategy.HitOrStandStrategy;
@@ -20,9 +19,9 @@ public class Game {
     public static final int CARDS_LEFT_IN_SHOE_RESHUFFLE_POINT = 52;
 
     private static Game instance;
-    private Dealer dealer;
-    private List<Player> players;
-    private List<Cardable> allParticipants;
+    private final Dealer dealer;
+    private final List<Player> players;
+    private final List<Cardable> allParticipants;
     private Shoe shoe;
 
     private Game(Dealer dealer, List<Player> players, Shoe shoe) {
@@ -65,7 +64,11 @@ public class Game {
                 // loop around players and dealer until dealer has 2 cards
                 dealStartingCards();
 
-                doesDealerHaveBlackJack();
+                if (doesDealerHaveBlackJack()) {
+                    // add insurance option TODO
+                    System.out.println("Dealer has blackjack!");
+                    return;
+                }
 
                 // Pause for input loop
                 //      show player total, ask if hit or stay
@@ -118,12 +121,9 @@ public class Game {
     }
 
     private void setUpShoe() {
-        // @TODO make number of decks configurable
         this.shoe = new Shoe();
-        for (int i = 0; i < NUMBER_OF_DECKS_FOR_SHOE; i++) {
-            Deck deck = Shuffler.shuffleDeck(new Deck());
-            this.shoe.addDeck(deck);
-        }
+        this.shoe.init(NUMBER_OF_DECKS_FOR_SHOE);
+        this.shoe = Shuffler.shuffleShoe(this.shoe, 5);
     }
 
     public void printGame(boolean clearScreen, boolean showDealerHoleCard) {
@@ -152,14 +152,6 @@ public class Game {
         // Use ANSI escape codes to clear the console
         System.out.print("\033[H\033[2J");
         System.out.flush();
-    }
-
-    public Dealer getDealer() {
-        return dealer;
-    }
-
-    public List<Player> getPlayers() {
-        return players;
     }
 
     public Shoe getShoe() {
