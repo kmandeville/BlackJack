@@ -1,5 +1,7 @@
 package me.kevinmandeville;
 
+import static me.kevinmandeville.Game.NUMBER_OF_DECKS_FOR_SHOE;
+
 import java.util.Random;
 import me.kevinmandeville.core.Card;
 import me.kevinmandeville.core.Deck;
@@ -10,15 +12,20 @@ import me.kevinmandeville.core.Shoe;
  */
 public class Shuffler {
 
+    public static final int NUMBER_OF_CARDS_IN_SHOE = 52 * NUMBER_OF_DECKS_FOR_SHOE;
+    private static final Random random = new Random();
+
+    private Shuffler() {
+    }
+
     public static Deck shuffleDeck(Deck deck) {
         // go through deck one at a time and create a new queue of cards to create a new Deck
         Card[] shuffledArray = new Card[52];
 
-        Random random = new Random();
         for (int i = 0; i < 52; i++) {
             Card card = deck.getTopCard();
             // find random slot for card in array
-            int arrayPos = 0;
+            int arrayPos;
 
             do {
                 arrayPos = random.nextInt(52);
@@ -46,13 +53,21 @@ public class Shuffler {
     }
 
     public static Shoe shuffleShoe(Shoe shoe) {
-        Shoe shuffledShoe = new Shoe();
+        Card[] shuffledArray = new Card[NUMBER_OF_CARDS_IN_SHOE];
 
-        for (Deck deck : shoe.getDecks()) {
-            shuffledShoe.addDeck(shuffleDeck(deck));
+        for (int i = 0; i < NUMBER_OF_CARDS_IN_SHOE; i++) {
+            Card card = shoe.getNextCard();
+            // find random slot for card in array
+            int arrayPos;
+
+            do {
+                arrayPos = random.nextInt(NUMBER_OF_CARDS_IN_SHOE);
+            } while (shuffledArray[arrayPos] != null);
+
+            shuffledArray[arrayPos] = card;
         }
 
-        return shuffledShoe;
+        return new Shoe(shuffledArray);
     }
 
     public static Shoe shuffleShoe(Shoe shoe, int iterations) {

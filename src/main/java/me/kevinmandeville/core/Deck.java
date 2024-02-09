@@ -50,6 +50,11 @@ public class Deck {
         return this.cards.remove();
     }
 
+    public Queue<Card> getCards() {
+        // defensive copy
+        return new LinkedList<>(this.cards);
+    }
+
     public int size() {
         return cards.size();
     }
@@ -77,8 +82,7 @@ public class Deck {
 
         int i = 0;
         for (Card card : cards) {
-            sb.append(i++ + ": " + card);
-            sb.append("\n\n");
+            sb.append(i++).append(": ").append(card).append("\n\n");
         }
         return sb.toString();
     }

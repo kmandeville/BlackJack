@@ -1,66 +1,56 @@
 package me.kevinmandeville.core;
 
-import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
+import me.kevinmandeville.Shuffler;
 
 /**
  * @author kmandeville
  */
 public class Shoe {
 
-    private Queue<Deck> decks;
+    private Queue<Card> cards;
 
     public Shoe() {
-        this.decks = new LinkedList<>();
+        this.cards = new LinkedList<>();
+    }
+
+    public Shoe(Card[] shuffledArray) {
+        this();
+        this.cards = new LinkedList<>();
+        this.cards.addAll(List.of(shuffledArray));
     }
 
     public void init(int numberOfDecks) {
         for (int i = 0; i < numberOfDecks; i++) {
-            this.decks.add(new Deck());
+            Deck newDeck = Shuffler.shuffleDeck(new Deck(), 4);
+            this.cards.addAll(newDeck.getCards());
         }
     }
 
     public Shoe(Shoe shoe) {
-        this.decks = new LinkedList<>(shoe.getDecks());
-    }
-
-    public void addDeck(Deck deck) {
-        this.decks.add(deck);
-    }
-
-    public void addDecks(Collection<Deck> decks) {
-        this.decks.addAll(decks);
+        this.cards = new LinkedList<>(shoe.getCards());
     }
 
     public Card getNextCard() {
-        if (decks.isEmpty()) {
-            throw new IllegalStateException("Shoe is empty. Set up new shoe with new shuffled decks");
+        if (this.cards.isEmpty()) {
+            throw new IllegalStateException("Shoe is empty. Set up new shoe new cards");
         }
 
-        Deck deck = decks.remove();
-        Card topCard = deck.getTopCard();
-
-        return topCard;
+        return this.cards.remove();
     }
 
     public int size() {
-        if (decks.isEmpty()) {
+        if (cards.isEmpty()) {
             return 0;
         }
 
-        int size = 0;
-        for (Deck deck : decks) {
-            size += deck.size();
-        }
-        return size;
+        return this.cards.size();
     }
 
-    public Shoe(Queue<Deck> decks) {
-        this.decks = decks;
-    }
 
-    public Queue<Deck> getDecks() {
-        return decks;
+    public Queue<Card> getCards() {
+        return new LinkedList<>(cards);
     }
 }
